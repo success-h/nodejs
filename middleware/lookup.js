@@ -1,4 +1,4 @@
-const courseData = require("../coursesData");
+const courseData = require("../dbData");
 
 function lookUp(req, res, next) {
   if (!req.params.id) {
