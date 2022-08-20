@@ -1,23 +1,34 @@
 const Joi = require("joi");
 const express = require("express");
 
-const lookUp = require("../middleware/lookup");
+const lookUp = require("../lookup");
 
 const {
-  movieData: { genres },
+  movieData: { genres, movies },
 } = require("../dbData");
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/genres", (req, res) => {
   res.send(genres);
 });
 
-router.get("/:id", lookUp, (req, res) => {
-  const genre = res.locals.name;
+router.get("/movies", (req, res) => {
+  res.send(movies);
+});
+
+router.get("/genres/:id", (req, res) => {
+  const id = req.params.id;
+  const genre = lookUp(genres, id);
   res.send(genre);
 });
 
-router.post("/", (req, res) => {
+router.get("/movies/:id", (req, res) => {
+  const id = req.params.id;
+  const movie = lookUp(movies, id);
+  res.send(movie);
+});
+
+router.post("/genres", (req, res) => {
   const { error, value } = validateMovies(req.body.name);
   if (error) {
     res.status(400).send(error.details[0].message);
@@ -32,10 +43,25 @@ router.post("/", (req, res) => {
   res.send(genre);
 });
 
-// put input
-router.put("/:id", lookUp, (req, res) => {
-  const genre = res.locals.name;
+router.post("/movies", (req, res) => {
+  const { error, value } = validateMovies(req.body.name);
+  if (error) {
+    res.status(400).send(error.details[0].message);
+    return;
+  }
+  const movie = {
+    id: movies.length + 1,
+    name: req.body.name,
+  };
 
+  movies.push(movie);
+  res.send(movie);
+});
+
+// put input
+router.put("/genres/:id", (req, res) => {
+  const id = req.params.id;
+  const genre = lookUp(genres, id);
   const { error, value } = validateMovies(req.body.name);
   if (error) {
     res.status(400).send(error.details[0].message);
@@ -45,15 +71,38 @@ router.put("/:id", lookUp, (req, res) => {
   res.send(genre);
 });
 
-// delete course
+// put input
+router.put("/movies/:id", (req, res) => {
+  const id = req.params.id;
+  const movie = lookUp(movies, id);
+  const { error, value } = validateMovies(req.body.name);
+  if (error) {
+    res.status(400).send(error.details[0].message);
+    return;
+  }
+  movie.name = req.body.name;
+  res.send(movie);
+});
 
-router.delete("/:id", lookUp, (req, res) => {
-  const genre = res.locals.name;
+// delete course
+router.delete("/genres/:id", (req, res) => {
+  const id = req.params.id;
+  const genre = lookUp(genres, id);
   const index = genres.indexOf(genre);
   genres.splice(index, 1);
   res.send(genre);
 });
 
+// delete course
+router.delete("/movies/:id", (req, res) => {
+  const id = req.params.id;
+  const movie = lookUp(movies, id);
+  const index = genres.indexOf(movie);
+  movies.splice(index, 1);
+  res.send(movie);
+});
+
+// validator
 const validateMovies = (course) => {
   const schema = Joi.object({
     name: Joi.string().min(3).required(),

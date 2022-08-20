@@ -22,7 +22,7 @@ const courseData = [
 ];
 
 const movieData = {
-  moves: [
+  movies: [
     {
       id: 1,
       name: "Action",

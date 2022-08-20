@@ -1,15 +1,16 @@
 const Joi = require("joi");
 const express = require("express");
-const courseData = require("../dbData");
+const { courseData } = require("../dbData");
 const router = express.Router();
-const lookUp = require("../middleware/lookup");
+const lookUp = require("../lookup");
 
 router.get("/", (req, res) => {
   res.send(courseData);
 });
 
-router.get("/:id", lookUp, (req, res) => {
-  const course = res.locals.name;
+router.get("/:id", (req, res) => {
+  const id = req.params.id;
+  const course = lookUp(courseData, id);
   res.send(course);
 });
 
@@ -29,8 +30,9 @@ router.post("/", (req, res) => {
 });
 
 // put input
-router.put("/:id", lookUp, (req, res) => {
-  const course = res.locals.name;
+router.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const course = lookUp(courseData, id);
 
   const { error, value } = validateCourse(req.body.name);
   if (error) {
@@ -43,8 +45,9 @@ router.put("/:id", lookUp, (req, res) => {
 
 // delete course
 
-router.delete("/:id", lookUp, (req, res) => {
-  const course = res.locals.name;
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  const course = lookUp(courseData, id);
   const index = courseData.indexOf(course);
   courseData.splice(index, 1);
   res.send(course);

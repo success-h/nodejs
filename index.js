@@ -5,8 +5,11 @@ const express = require("express");
 const helment = require("helmet");
 const debug = require("debug")("app:startup");
 const app = express();
+
 const courses = require("./routes/courses");
+const movies = require("./routes/movies");
 const home = require("./routes/home");
+
 app.set("view engine", "pug");
 app.set("views", "./views");
 
@@ -20,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(helment());
 app.use("/api/courses", courses);
+app.use("/api", movies);
 app.use("/", home);
 
 const port = process.env.POST || 3000;
